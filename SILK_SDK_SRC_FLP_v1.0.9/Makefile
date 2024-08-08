@@ -1,5 +1,5 @@
-#					
-# Makefile for Silk SDK			
+#
+# Makefile for Silk SDK
 #
 # Copyright (c) 2012, Skype Limited
 # All rights reserved.
@@ -10,7 +10,7 @@
 BUILD_OS := $(shell uname | sed -e 's/^.*Darwin.*/MacOS-X/ ; s/^.*CYGWIN.*/Windows/')
 BUILD_ARCHITECTURE := $(shell uname -m | sed -e 's/i686/i386/')
 
-EXESUFFIX = 
+EXESUFFIX =
 LIBPREFIX = lib
 LIBSUFFIX = .a
 OBJSUFFIX = .o
@@ -34,7 +34,7 @@ LDFLAGS += $(call ldflags-from-ldlibdirs,$(LDLIBDIRS))
 LDLIBS  += $(call ldlibs-from-libs,$(LIBS))
 
 COMPILE.c.cmdline   = $(CC) -c $(CFLAGS) -o $@ $<
-LINK.o.cmdline      = $(LINK.o) $^ $(LDLIBS) -lm -o $@$(EXESUFFIX) 
+LINK.o.cmdline      = $(LINK.o) $(filter-out lib,$^) $(LDLIBS) -lm -o $@$(EXESUFFIX)
 ARCHIVE.cmdline     = $(AR) $(ARFLAGS) $@ $^ && $(RANLIB) $@
 
 %$(OBJSUFFIX):%.c
@@ -48,7 +48,7 @@ CINCLUDES += interface src test
 VPATH = ./ \
         interface \
         src \
-        test 
+        test
 
 # Variable definitions
 LIB_NAME = SKP_SILK_SDK
@@ -75,20 +75,20 @@ LDLIBDIRS = ./
 # Rules
 default: all
 
-all: $(TARGET) encoder decoder signalcompare
+all: $(TARGET) encoder$(EXESUFFIX) decoder$(EXESUFFIX) signalcompare$(EXESUFFIX)
 
 lib: $(TARGET)
 
 $(TARGET): $(OBJS)
 	$(ARCHIVE.cmdline)
 
-encoder$(EXESUFFIX): $(ENCODER_OBJS)	
+encoder$(EXESUFFIX): $(ENCODER_OBJS) lib
 	$(LINK.o.cmdline)
 
-decoder$(EXESUFFIX): $(DECODER_OBJS)	
+decoder$(EXESUFFIX): $(DECODER_OBJS) lib
 	$(LINK.o.cmdline)
 
-signalcompare$(EXESUFFIX): $(SIGNALCMP_OBJS)	
+signalcompare$(EXESUFFIX): $(SIGNALCMP_OBJS) lib
 	$(LINK.o.cmdline)
 
 clean:
